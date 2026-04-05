@@ -2,12 +2,76 @@
 
 This MCP (Model Context Protocol) server provides PostgreSQL database integration for Claude Code, allowing you to query and interact with your PostgreSQL databases directly from Claude.
 
-## Quick Start (Recommended)
+## Docker Setup
+
+### Prerequisites
+- Docker installed on your system
+- PostgreSQL database accessible (local or remote)
+
+### Build the Docker Image
+
+```bash
+docker build -t mcp-postgresql .
+```
+
+### Run the Container
+
+```bash
+docker run -d \
+  --name mcp-postgresql \
+  -e DB_HOST=localhost \
+  -e DB_PORT=5432 \
+  -e DB_USER=your_username \
+  -e DB_PASSWORD=your_password \
+  -e DB_NAME=your_database \
+  mcp-postgresql
+```
+
+Or using a `.env` file:
+
+```bash
+docker run -d \
+  --name mcp-postgresql \
+  --env-file .env \
+  mcp-postgresql
+```
+
+### Add to Claude Code via Docker
+
+```bash
+claude mcp add postgresql "docker run --rm -i mcp-postgresql" \
+  --env DB_HOST=localhost \
+  --env DB_PORT=5432 \
+  --env DB_USER=your_username \
+  --env DB_PASSWORD=your_password \
+  --env DB_NAME=your_database
+```
+
+### Docker Compose
+
+For easier management, use Docker Compose:
+
+```bash
+# Create your .env file
+cp .env.docker .env
+# Edit .env with your database credentials
+
+# Start the container
+docker-compose up -d
+```
+
+Add to Claude Code with Docker Compose:
+
+```bash
+claude mcp add postgresql "docker-compose run --rm mcp-postgresql"
+```
+
+## Quick Start (Recommended - Local)
 
 Add this MCP server to Claude Code with environment variables:
 
 ```bash
-claude mcp add postgresql "node /Users/hendraw/Hendraw/FR8LAB/mcp-postgresql/index.js" \
+claude mcp add postgresql "node $(pwd)/index.js" \
   --env PGHOST=localhost \
   --env PGPORT=5432 \
   --env PGDATABASE=your_database_name \
@@ -22,7 +86,7 @@ Replace the environment variable values with your actual PostgreSQL connection d
 If you prefer to set environment variables separately, you can add the server first:
 
 ```bash
-claude mcp add postgresql "node /Users/hendraw/Hendraw/FR8LAB/mcp-postgresql/index.js"
+claude mcp add postgresql "node $(pwd)/index.js"
 ```
 
 Then configure the environment variables in your Claude Code settings or system environment.
@@ -39,7 +103,7 @@ For more control, you can manually edit the MCP configuration file:
   "mcpServers": {
     "postgresql": {
       "command": "node",
-      "args": ["/Users/hendraw/Hendraw/FR8LAB/mcp-postgresql/index.js"],
+      "args": ["/path/to/mcp-postgresql/index.js"],
       "env": {
         "PGHOST": "localhost",
         "PGPORT": "5432",
@@ -100,7 +164,7 @@ To add this PostgreSQL MCP server to Kilo Code:
      "mcpServers": {
        "postgresql": {
          "command": "node",
-         "args": ["/Users/hendraw/Hendraw/FR8LAB/mcp-postgresql/index.js"],
+         "args": ["/path/to/mcp-postgresql/index.js"],
          "env": {
            "PGHOST": "localhost",
            "PGPORT": "5432",
